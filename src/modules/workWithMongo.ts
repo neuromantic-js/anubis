@@ -1,12 +1,14 @@
 /* Main imports */
 import mongoose = require("mongoose");
 import configs from "../../configs/config";
+import Logger from "./logger";
 /**
  * @class workWithMongoose
  */
 export default class workWithMongo {
     private mongoDbConnectionString: string;
     private connection: mongoose.Connection;
+    private logger: Logger;
     /**
      * Set connection string to MongoDB.
      * Get data from configs.
@@ -48,9 +50,22 @@ export default class workWithMongo {
      */
     private connectToDatabase():any {
         this.connection = mongoose.createConnection(this.mongoDbConnectionString, (error, result) => {
-            // Add logger
-            console.log("MongoDB has connected");
+            /* Log in console */
+            this.logger.console("info", "MongoDB is connected!");
         });
+    }
+    /**
+     * Set logger to Mongoose object
+     *
+     * @class workWithMongo
+     * @method setLogger
+     */
+    private setLogger():void {
+        /* Set logger options */
+        const options: Object = {
+            "path": "mongoose.connection"
+        };
+        this.logger = new Logger(options);
     }
     /**
      * Constructor
@@ -58,6 +73,7 @@ export default class workWithMongo {
      * @constructor
      */
     constructor() {
+        this.setLogger();
         mongoose.Promise = global.Promise;
         this.setMongoDbConnectionString();
         this.connectToDatabase();
