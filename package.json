@@ -1,0 +1,59 @@
+{
+    "name": "baron-samedi",
+    "version": "0.0.1",
+    "description": "Baron Samedi - it is boilerplate/framework based on Express/NodeJS, worked with MongoDB, PGSQL and cached in Redis.",
+    "main": "index.js",
+    "scripts": {
+        "start": "if-env NODE_DEV=production && ts-node ./src/app.ts || nodemon --exec ts-node ./src/app.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+"
+    },
+    "keywords": [
+        "typescript",
+        "nodejs"
+    ],
+    "author": "Dmitry Shevelev",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/neuromantic-js/baron-saturday-ts/issues"
+    },
+    "homepage": "https://github.com/neuromantic-js/baron-saturday-ts#readme",
+    "dependencies": {
+        "@types/body-parser": "^1.16.5",
+        "@types/cookie-parser": "^1.4.1",
+        "@types/errorhandler": "0.0.31",
+        "@types/express": "^4.0.37",
+        "@types/jsonwebtoken": "^7.2.3",
+        "@types/method-override": "0.0.30",
+        "@types/mongoose": "^4.7.21",
+        "@types/request-promise": "^4.1.37",
+        "body-parser": "^1.17.2",
+        "cookie-parser": "^1.4.3",
+        "errorhandler": "^1.5.0",
+        "express": "^4.15.4",
+        "if-env": "^1.0.0",
+        "jsonwebtoken": "^7.4.3",
+        "method-override": "^2.3.9",
+        "mongoose": "^4.11.9",
+        "morgan": "^1.8.2",
+        "pug": "^2.0.0-rc.3",
+        "q": "^1.5.0",
+        "request": "^2.81.0",
+        "request-promise": "^4.2.1",
+        "should": "^11.2.1"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.0.4",
+        "@types/mocha": "^2.2.42",
+        "@types/mongodb": "^2.2.10",
+        "@types/morgan": "^1.7.32",
+        "@types/node": "^8.0.26",
+        "chai": "^4.1.1",
+        "mocha": "^3.5.0",
+        "nodemon": "^1.11.0",
+        "ts-node": "^3.3.0",
+        "typescript": "^2.4.2"
+    }
+}

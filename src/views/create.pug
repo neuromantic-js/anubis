@@ -1,0 +1,53 @@
+extends base.pug
+
+block content
+  div.ui.grid
+    div.three.column.row
+      div.column.ten.wide.centered
+         h1.ui.header #{header}
+         if isError
+           div.ui.red.message
+             strong Ошибка! 
+             span Сохранить карточку микросервиса не удалось. Попробуйте еще раз или обратитесь в техническую поддержку сервиса Maman Brigitte.
+         if isSuccess
+           div.ui.green.message
+             strong Поздавляем!
+             span  Карточка микросервиса успешно сохранена.
+  div.ui.grid
+    div.three.column.row
+      div.column.ten.wide.centered
+        form.ui.form(method="post")
+          div.ui.grid
+            div.row
+              div.column.eight.wide
+                div.field
+                  label Наименование микросервиса
+                  input(type="text", placeholder="Наименование", name="name")
+                div.field
+                  label Ссыдка на GitLab
+                  input(type="text", placeholder="Gitlab", name="gitlab")
+                div.field
+                  label Версия
+                  input(type="text", placeholder="Версия", name="version")
+                div.field
+                  label Описание функция
+                  textarea(name="description")
+                div.field
+                  label Владелец
+                  input(type=text, placeholder="neuromanticjs", name="owner")
+              div.column.eight.wide
+                div.field
+                  label Ссылка на документацию
+                  input(type="text", placeholder="Документация", name="documentation")
+                div.field
+                  label Системные требования
+                  input(type="text", placeholder="Системные требования", name="requements")
+                div.field
+                  label Дата релиза
+                  input(type="text", placeholder="Наименование", name="date")
+                div.field
+                  label Завивимости
+                  textarea(name="dependencies")
+                button.ui.blue.submit.button(type="submit") Сохранить
+                a.ui.button.negative(href="/list") Назад
+

@@ -1,0 +1,48 @@
+extends base.pug
+
+block content
+  div.ui.grid
+    div.three.column.row
+      div.column.ten.wide.centered
+        if count
+          div.ui.grid
+            div.four.column.row
+              div.left.floated.column.centered
+                a.positive.ui.button(href="/create") Создать
+              div.right.floated.column.cntered
+                a.negative.ui.right.button(href="/logout") Выйти
+          div.ui.relaxed.divided.list
+            each entry in result
+              div.item
+                i.class.large.gitlab.middle.aligned.icon
+                div.content
+                  a.header(href="/card/" + entry._id) #{entry.name}
+                div.description
+                  span
+                    strong Ссылка на Документацию: 
+                    a(href=entry.documentation) #{entry.documentation}
+                  br
+                  span
+                    strong Описание:
+                    span #{entry.description}
+          div.ui.grid
+            div.four.column.row
+              if canBack
+                div.right.floated.column.centered
+                  a.ui.left.labeled.icon.button(href=urlBack)
+                    i.left.arrow.icon
+                    span Назад
+              if canNext
+                if nextSee
+                  div.right.floated.column.centered
+                    a.ui.right.labeled.icon.button(href=urlNext)
+                      i.right.arrow.icon
+                      span Вперед
+        else
+          div.ui.grid
+            div.four.column.row              
+              div.left.floated.column.centered
+                a.positive.ui.button(href="/create") Создать
+              div.right.floated.column.cntered
+                a.negative.ui.right.button(href="/logout") Выйти
+          div.ui.red.message Извините. Список микросервисов пуст. Нажмите "Создать" для того, чтобы добавить первую карточку микросервиса!
