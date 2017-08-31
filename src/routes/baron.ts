@@ -10,7 +10,7 @@ export class BaronRoute extends BaseRoute {
      * Create the routes
      *
      * @class BaronRoute
-     * method create
+     * @method create
      * @static
      */
     public static create(router: Router) {

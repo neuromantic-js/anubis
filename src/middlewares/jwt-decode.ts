@@ -4,16 +4,16 @@
 import * as express from "express";
 import jwt = require("jsonwebtoken");
 import User from "../types/user";
+import config from "../../configs/config";
 /**
  * Main constants
  */
-const secretWord = "052lrWngfxVv";
+const secretWord: string = String(config.jwt.salt);
 const decodeToken = (token: string): Promise<User> => {
     /* Return promise */
     return new Promise<User>((resolve, reject) => {
         /* Try decode token */
         jwt.verify(token, secretWord, (error, decoded) => {
-            console.log("DECODED: ", decoded)
             /* Check returned value */
             if(error !== null) {
                 /* Return error */
@@ -53,16 +53,24 @@ const getTokenString = (req: express.Request): string => {
     return String(token);
 };
 /*
- * Middleware function as const
+ * @class JWTMiddleware
  */
 export default class JWTMiddleware {
-    /* Constructor */
+    /**
+     * Constructor
+     *
+     * @class JWTMiddleware
+     * @constructor
+     */
     constructor() {}
     /**
      * Method for access without decode
      *
      * @class JWTMiddleware
      * @method withoutDecode
+     * @param req {Request} The express request object
+     * @param res {Response} The express response object
+     * @next {NextFunction} Execute the next method
      */
     withoutDecode(req: express.Request, res: express.Response, next: express.NextFunction): void {
         next();
@@ -72,6 +80,9 @@ export default class JWTMiddleware {
      *
      * @class JWTMiddleware
      * @method onlyDecode
+     * @param req {Request} The express request object
+     * @param res {Response} The express response object
+     * @next {NextFunction} Execute the next method
      */
     onlyDecode(req: express.Request, res: express.Response, next: express.NextFunction): void {
         /* Try get token */
@@ -99,9 +110,11 @@ export default class JWTMiddleware {
      *
      * @class JWTMiddleware
      * @mathod decodeAndWrite
+     * param req {Request} The express request object
+     * @param res {Response} The express response object
+     * @next {NextFunction} Execute the next method
      */
     decodeAndWriter(req: express.Request, res: express.Response, next: express.NextFunction): void {
-        console.log("DECODE TOKEN !!!");
         /* Try get token */
         const token = getTokenString(req);
         /* Check token */
@@ -114,7 +127,6 @@ export default class JWTMiddleware {
                     next();
                 })
                 .catch(error => {
-                    console.log("THIS");
                     res.redirect("/login");
                 });
         } else {

@@ -7,21 +7,12 @@ import errorHandler = require("errorhandler");
 import methodOverride = require("method-override");
 import mongoose = require("mongoose");
 /* Import routes */
-import { IndexRoute } from "./routes/index";
 import { BaronRoute } from "./routes/baron";
-import { LoginRoute } from "./routes/login";
-import { MicroservicesList } from "./routes/microservices";
-import { CreateEntryRouter } from "./routes/create-entry";
-import { ViewCardRouter } from "./routes/view-card";
-import { LogoutRoute } from "./routes/logout";
-/* Imports fo ODB
+/* Imports fo ODM
  * interfaces */
-import { IMicroservice } from "./interfaces/microservice";
 /* Models */
 import { IModel } from "./models/model";
-import { IMicroserviceModel } from "./models/microservice";
 /* Schemas */
-import { microserviceSchema } from "./schemas/microservice";
 /* import middlewares */
 import JWTMiddleware from "./middlewares/jwt-decode";
 /**
@@ -64,7 +55,6 @@ export class Server {
         /* Add api */
         this.api();
     }
-
     /**
      * Create REST API routes
      *
@@ -74,7 +64,6 @@ export class Server {
     public api() {
         //empty for now
     }
-
     /**
      * Configure application
      *
@@ -108,8 +97,6 @@ export class Server {
         mongoose.Promise = global.Promise;
         /* Connection to mongoose */
         let connection: mongoose.Connection = mongoose.createConnection(MONGODB_CONNECTION);
-        /* Create models */
-        this.model.microservice = connection.model<IMicroserviceModel>("Microservice", microserviceSchema);
         /* Catch 404 and forward to error handler */
         this.app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
             error.status = 404;
@@ -136,17 +123,11 @@ export class Server {
      * @return void
      */
     private routes() {
+        /* Set express router variable */
         let router: express.Router;
         router = express.Router();
-        console.log(this.model.microservice);
         /* IndexRoute */
-        IndexRoute.create(router);
         BaronRoute.create(router);
-        LoginRoute.create(router);
-        MicroservicesList.create(router, this.model);
-        ViewCardRouter.create(router, this.model);
-        CreateEntryRouter.create(router, this.model);
-        LogoutRoute.create(router);
         /* Use router middleware */
         this.app.use(router);
     }

@@ -8,7 +8,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+"
+        "url": "https://github.com/neuromantic-js/baron-samedi.git"
     },
     "keywords": [
         "typescript",
@@ -28,6 +28,8 @@
         "@types/jsonwebtoken": "^7.2.3",
         "@types/method-override": "0.0.30",
         "@types/mongoose": "^4.7.21",
+        "@types/ramda": "github:types/npm-ramda#dist",
+        "@types/redis": "^2.6.0",
         "@types/request-promise": "^4.1.37",
         "body-parser": "^1.17.2",
         "cookie-parser": "^1.4.3",
@@ -38,10 +40,15 @@
         "method-override": "^2.3.9",
         "mongoose": "^4.11.9",
         "morgan": "^1.8.2",
+        "pg": "^7.2.0",
+        "pg-hstore": "^2.3.2",
         "pug": "^2.0.0-rc.3",
         "q": "^1.5.0",
+        "ramda": "^0.24.1",
+        "redis": "^2.8.0",
         "request": "^2.81.0",
         "request-promise": "^4.2.1",
+        "sequelize": "^4.8.0",
         "should": "^11.2.1"
     },
     "devDependencies": {

@@ -1,68 +1,100 @@
+/**
+ * The User for JWT
+ *
+ * @class Server
+ */
 export default class User {
+    /**
+     * Class variables
+     */
     private isUnsafe: boolean;
     private name: string;
     private id: number;
     private referrer: string;
     private rule: string;
     private date: Date;
-    private customerType: string;
-    private error: string;
-    /* Getters */
+    /**
+     * Assigning a variable "name" value
+     * @class User
+     * @method getName
+     */
     public getName():string {
         return this.name;
     }
-    public getIsUnsafe():boolean {
-        return this.isUnsafe;
-    }
+    /**
+     * Assigning a variable "id" value
+     * @class User
+     * @method getId
+     */
     public getId():number {
         return this.id;
     }
+    /**
+     * Assigning a variable "referrer" value
+     * @class User
+     * @method getReferrer
+     */
     public getReferrer():string {
         return this.referrer;
     }
+    /**
+     * Assigning a variable "rule" value
+     * @class User
+     * @method getRule
+     */
     public getRule():string {
         return this.rule;
     }
-    public getTimestamp():Date {
-        return this.date;
-    }
-    public getCustomerType():string {
-        return this.customerType;
-    }
+    /**
+     * Assigning a variable "name" value
+     * @class User
+     * @method getName
+     */
     public getMe(): User {
         return this;
     }
-    /* Setters */
+    /**
+     * Assigning a variable "name" value
+     * @class User
+     * @method setName
+     */
     public setName(value: string):void {
         this.name = value;
     }
-    public setIsUnsafe(value: boolean):void {
-        this.isUnsafe = value;
-    }
+    /**
+     * Assigning a variable "id" value
+     * @class User
+     * @method setId
+     */
     public setId(value: number):void {
         this.id = value;
     }
+    /**
+     * Assigning a variable "referrer" value
+     * @class User
+     * @method setReferrer
+     */
     public setReferrer(value: string):void {
         this.referrer = value;
     }
+    /**
+     * Assigning a variable "rule" value
+     * @class User
+     * @method setRule
+     */
     public setRule(value: string):void {
         this.rule = value;
     }
-    public setTimestamp(value: string):void {
-        this.date = new Date(Number(value));
-    }
-    public setCustomerType(value: string):void {
-        this.customerType = value;
-    }
-    /* Constructor */
+    /**
+     * Constructor
+     *
+     * @class User
+     * @constructor
+     */
     constructor(obj){
-        console.log(obj)
         this.setName(obj.username);
-        this.setIsUnsafe(Boolean(obj.is_unsafe));
         this.setId(Number(obj.user_id));
         this.setReferrer(String(obj.referrer));
         this.setRule(String(obj.type));
-        this.setTimestamp(obj.timestamp);
-        this.setCustomerType(String(obj.customer_type));
     }
 }
