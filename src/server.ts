@@ -11,13 +11,14 @@ import configs from "../configs/config";
 /* Check mongo-express variable */
 import mongoExpress = require("mongo-express/lib/middleware");
 import mongoExpressConfig from "../configs/mongo-express-config";
-//import mongoExpressConfig = require("../configs/config.default.js");
 /* Import routes */
 import { BaronRoute } from "./routes/baron";
 /* Imports fo ODM
  * interfaces */
 /* Models */
 import { IModel } from "./models/model";
+/* Import main modules */
+import workWithMongo from "./modules/workWithMongo";
 /* Schemas */
 /* import middlewares */
 import JWTMiddleware from "./middlewares/jwt-decode";
@@ -79,8 +80,6 @@ export class Server {
      * @method config
      */
     public config() {
-        /* MongoDB default path */
-        const MONGODB_CONNECTION: string = "mongodb://localhost:27017/baron-samedi";
         /* Add static path */
         this.app.use(express.static(path.join(__dirname, "public")));
         /* Configure PUG */
@@ -100,11 +99,10 @@ export class Server {
         this.app.use(methodOverride());
         /* Add my custom middlewares */
         this.customMiddlewares();
-        /* Use q promises */
-        //global.Promise = require("q").Promise
-        mongoose.Promise = global.Promise;
-        /* Connection to mongoose */
-        let connection: mongoose.Connection = mongoose.createConnection(MONGODB_CONNECTION);
+        /* Check database main */
+        if(configs.databases.main == "mongodb") {
+            const mongooseConnection: workWithMongo = new workWithMongo();
+        }
         /* Check run mongo-express */
         if(configs.mongoExpress.run) {
             this.app.use("/baron-admin", mongoExpress(mongoExpressConfig));
@@ -128,7 +126,7 @@ export class Server {
         this.app.use(jwtMiddleware.withoutDecode);
     }
     /**
-     * Create router.
+     * Create router (with render).
      *
      * @class Server
      * @method config
