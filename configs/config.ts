@@ -10,8 +10,8 @@ const config =  {
             "host": "localhost",
             "port": 27017,
             "auth": false,
-            "user": "neuromantic",
-            "example": "example",
+            "user": "",
+            "password": "",
             "dbname": "baron-samedi"
         },
         "redis": {
@@ -35,6 +35,34 @@ const config =  {
         "salt": "052lrWngfxVv",
         "referrer": "sdvor",
         "provider": "https://auth.itlabs.io"
+    },
+    "mongoExpress": {
+        "run": true,
+        "autoReconnect": true,
+        "poolSize": 4,
+        "enableAdmin": true,
+        "login": "",
+        "password": "",
+        "baseUrl": "/",
+        "cookieKeyName": "mongo-express",
+        "cookieSecret": "cookiesecret",
+        "requestSizeLimit": "50mb",
+        "sessionSecret": "sessionsecret",
+        "sslKey": "",
+        "sslEnabled": false,
+        "sslCert": "",
+        "useBasicAuth": true,
+        "basicAuthLogin": "baron",
+        "basicAuthPassword":"samedi",
+        "documentPerPage": 10,
+        "editorTheme": "rubyblue",
+        "maxPropSize": (100*1000),
+        "maxRowSize": (1000*1000),
+        "cmdType": "eval",
+        "subprocessTimeout": 300,
+        "readOnly": false,
+        "defaultKeyNames": {},
+        "url":"mongodb://localhost27017/baron-samedi"
     }
 };
 export default config;

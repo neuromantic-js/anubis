@@ -1,19 +1,21 @@
 {
-	"compilerOptions": {
-		"module": "commonjs",
-		"target": "es6",
-		 "types": [
+	  "compilerOptions": {
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "allowJs": true,
+		    "module": "commonjs",
+		    "target": "es6",
+		    "types": [
             "node"
-         ],
-         "typeRoots": [
+        ],
+        "typeRoots": [
             "node_modules/@types"
-         ],
-         "outDir": "dist",
-         "watch": true
-
-  	},
+        ],
+        "outDir": "dist",
+        "watch": true
+    },
   	"include": [
-  		"src/**/*.ts"
+  		  "src/**/*.ts"
   	],
   	"exclude": [
   		"node_modules"

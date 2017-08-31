@@ -6,6 +6,12 @@ import * as path from "path";
 import errorHandler = require("errorhandler");
 import methodOverride = require("method-override");
 import mongoose = require("mongoose");
+/* Configuration server constant */
+import configs from "../configs/config";
+/* Check mongo-express variable */
+import mongoExpress = require("mongo-express/lib/middleware");
+import mongoExpressConfig from "../configs/mongo-express-config";
+//import mongoExpressConfig = require("../configs/config.default.js");
 /* Import routes */
 import { BaronRoute } from "./routes/baron";
 /* Imports fo ODM
@@ -23,7 +29,7 @@ import JWTMiddleware from "./middlewares/jwt-decode";
 export class Server {
     public app: express.Application;
     private model: IModel;
-
+    private configs: Object
     /**
      * Bootstrap the application.
      *
@@ -46,6 +52,8 @@ export class Server {
         /* Instance default
          * initialize this to an empty object */
         this.model = Object();
+        /* Set configs */
+        this.configs = configs;
         /* Create expressjs application */
         this.app = express();
         /* Configure application */
@@ -72,7 +80,7 @@ export class Server {
      */
     public config() {
         /* MongoDB default path */
-        const MONGODB_CONNECTION: string = "mongodb://localhost:27017/maman-brigitte"
+        const MONGODB_CONNECTION: string = "mongodb://localhost:27017/baron-samedi";
         /* Add static path */
         this.app.use(express.static(path.join(__dirname, "public")));
         /* Configure PUG */
@@ -97,6 +105,10 @@ export class Server {
         mongoose.Promise = global.Promise;
         /* Connection to mongoose */
         let connection: mongoose.Connection = mongoose.createConnection(MONGODB_CONNECTION);
+        /* Check run mongo-express */
+        if(configs.mongoExpress.run) {
+            this.app.use("/baron-admin", mongoExpress(mongoExpressConfig));
+        }
         /* Catch 404 and forward to error handler */
         this.app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
             error.status = 404;
