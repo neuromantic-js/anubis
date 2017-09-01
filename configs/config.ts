@@ -3,6 +3,11 @@ const config =  {
         "host": "localhost",
         "port": 8080,
     },
+    "logger": {
+        "level": "errors",
+        "type": "json",
+        "console": true
+    },
     "databases" :{
         "main": "mongodb",
         "cache": "redis",

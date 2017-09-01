@@ -72,7 +72,7 @@ export default class JWTMiddleware {
      * @param res {Response} The express response object
      * @next {NextFunction} Execute the next method
      */
-    withoutDecode(req: express.Request, res: express.Response, next: express.NextFunction): void {
+    public withoutDecode(req: express.Request, res: express.Response, next: express.NextFunction): void {
         next();
     }
     /**
@@ -84,7 +84,7 @@ export default class JWTMiddleware {
      * @param res {Response} The express response object
      * @next {NextFunction} Execute the next method
      */
-    onlyDecode(req: express.Request, res: express.Response, next: express.NextFunction): void {
+    public onlyDecode(req: express.Request, res: express.Response, next: express.NextFunction): void {
         /* Try get token */
         const token = getTokenString(req);
         /* Check token */

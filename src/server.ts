@@ -3,7 +3,6 @@ import * as cookieParser from "cookie-parser";
 import * as express from "express";
 import * as logger from "morgan";
 import * as path from "path";
-import errorHandler = require("errorhandler");
 import methodOverride = require("method-override");
 import mongoose = require("mongoose");
 /* Configuration server constant */
@@ -22,6 +21,7 @@ import workWithMongo from "./modules/workWithMongo";
 /* Schemas */
 /* import middlewares */
 import JWTMiddleware from "./middlewares/jwt-decode";
+import logErrors from "./middlewares/logErrors";
 /**
  * The server.
  *
@@ -61,6 +61,8 @@ export class Server {
         this.config();
         /* Add routes */
         this.routes();
+        /* Add middlewares with post data */
+        this.postRequestMiddlewares();
         /* Add api */
         this.api();
     }
@@ -86,7 +88,7 @@ export class Server {
         this.app.set("views", path.join(__dirname, "views"));
         this.app.set("view engine", "pug");
         /* Use logger middleware */
-        this.app.use(logger("dev"));
+        //this.app.use(logger("dev"));
         /* Use JSON parser middleware */
         this.app.use(bodyParser.json());
         /* Use query string parser middlewares */
@@ -107,13 +109,6 @@ export class Server {
         if(configs.mongoExpress.run) {
             this.app.use("/baron-admin", mongoExpress(mongoExpressConfig));
         }
-        /* Catch 404 and forward to error handler */
-        this.app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-            error.status = 404;
-            next(error);
-        });
-        /* Use error handling */
-        this.app.use(errorHandler());
     }
     /**
      * Add custom middlewares
@@ -122,8 +117,17 @@ export class Server {
      * @method Custom middlewares
      */
     private customMiddlewares() {
-        var jwtMiddleware =  new JWTMiddleware();
+        /* Add access control middlewares */
+        const jwtMiddleware =  new JWTMiddleware();
         this.app.use(jwtMiddleware.withoutDecode);
+    }
+    /**
+     * Add middlewares before response
+     */
+    private postRequestMiddlewares() {
+        /* Add loggers */
+        const LogErrors = new logErrors();
+        this.app.use(LogErrors.onlyError);
     }
     /**
      * Create router (with render).

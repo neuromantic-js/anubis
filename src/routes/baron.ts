@@ -44,8 +44,13 @@ export class BaronRoute extends BaseRoute {
         let options: Object = {
             "message": "Welcome to catalog of microservices"
         };
+        const testError = true;
         /* Render template */
-        this.render(req, res, "about.pug");
-
+        if(testError){
+            const error = new Error("NotFound");
+            next(error);
+        } else {
+            this.render(req, res, "about.pug");
+        }
     }
 }
