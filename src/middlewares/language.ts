@@ -5,9 +5,9 @@ import * as express from "express";
  */
 export default class language {
     /**
-     * Creates an instance of CORS.
+     * Creates an instance of language.
      * 
-     * @memberOf CORS
+     * @memberOf language
      */
     constructor() {}
     /**
@@ -17,7 +17,7 @@ export default class language {
      * @param {express.Response} res 
      * @param {express.NextFunction} next 
      * 
-     * @memberOf CORS
+     * @memberOf language
      */
     public addLanguageToRequest(req: express.Request, res: express.Response, next: express.NextFunction): void {
         /* Get from headers or set */
@@ -30,5 +30,6 @@ export default class language {
             writable: true,
             configurable: true
         });
+        next();
     }
 }

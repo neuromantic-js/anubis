@@ -144,11 +144,12 @@ export class Server {
         const cors = new CORS();
         const configCors = configs.cors;
         /* Set some options for CORS */
+        console.log(configCors);
         cors.setOrigin(configCors.origin);
         cors.setHeaders(configCors.headers);
         cors.setMethods(configCors.methods);
         /* Add CORS middleware */
-        this.app.use(cors.cors);
+        this.app.use(cors.cors.bind(cors));
     }
     /**
      * Add middlewares before response

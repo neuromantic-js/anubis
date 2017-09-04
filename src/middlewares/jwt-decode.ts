@@ -67,7 +67,6 @@ export default class JWTMiddleware {
      */
     constructor(crypt: Crypt) {
         this.crypt = crypt;
-        console.log("ASD", this);
     }
     /**
      * Return current crypt

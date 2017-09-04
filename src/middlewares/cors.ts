@@ -14,18 +14,6 @@ export default class CORS {
      */
     constructor() {}
     /**
-     * Return options and add headers
-     * 
-     * @param {express.Request} req 
-     * @param {express.Response} res 
-     * @param {express.NextFunction} next 
-     * 
-     * @memberOf CORS
-     */
-    public checkCors(req: express.Request, res: express.Response, next: express.NextFunction): void {
-        
-    }
-    /**
      * Set access control all origin
      * 
      * @param {string} value 

@@ -38,7 +38,7 @@ export class BaronRoute extends BaseRoute {
      * @next {NextFunction} Execute the next method
      */
     public getBaronInfo(req: Request, res: Response, next: NextFunction) {
-        console.log((<any>req).auth);
+        console.log("THIS");
         /* Set custom title */
         this.title = "About | Baron Samedi";
         /* Set options */
