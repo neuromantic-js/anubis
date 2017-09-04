@@ -41,9 +41,9 @@ const config =  {
         }
     },
     "jwt": {
-        "salt": "052lrWngfxVv",
-        "referrer": "sdvor",
-        "provider": "https://auth.itlabs.io"
+        "salt": "123xyz",
+        "referrer": "baron",
+        "provider": "https://auth.baron.io"
     },
     "mongoExpress": {
         "run": true,
