@@ -138,7 +138,7 @@ export default class Crypt {
      * 
      * @memberOf Crypt
      */
-    public addMode(name: string, value: any):void {
+    public addModel(name: string, value: any):void {
         let model: Object = (<any>this.grave).model;
         if(model.hasOwnProperty(name) === true) {
             model[name] = value;
