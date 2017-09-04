@@ -68,7 +68,7 @@ export default class Crypt {
             sentry: undefined,
             mongo: undefined,
             pqsql: undefined,
-            models: undefined,
+            model: undefined,
             app: undefined
         };
         /* Set grave in crypt */
@@ -129,5 +129,26 @@ export default class Crypt {
             writable: true,
             configurable: true
         });
+    }
+    /**
+     * Addd new model to crypt
+     * 
+     * @param {string} name 
+     * @param {*} value 
+     * 
+     * @memberOf Crypt
+     */
+    public addMode(name: string, value: any):void {
+        let model: Object = (<any>this.grave).model;
+        if(model.hasOwnProperty(name) === true) {
+            model[name] = value;
+        } else {
+            Object.defineProperty(model, name, {
+                value: value,
+                writable: true,
+                configurable: true
+            });
+        }
+
     }
 }

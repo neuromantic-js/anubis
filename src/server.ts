@@ -29,6 +29,7 @@ import Crypt from "./modules/crypt";
 import AccessControl from "./middlewares/accessControl";
 import SentryService from "./modules/sentryService";
 import CORS from "./middlewares/cors";
+import Language from "./middlewares/language";
 /**
  * The server.
  *
@@ -136,6 +137,9 @@ export class Server {
         /* Add access coontrol middlewares (by cehck decoded) */
         const accessControl = new AccessControl();
         this.app.use(accessControl.checkAccess);
+        /* Add language to request */
+        const language = new Language();
+        this.app.use(language.addLanguageToRequest);
         /* Add cors request */
         const cors = new CORS();
         const configCors = configs.cors;
