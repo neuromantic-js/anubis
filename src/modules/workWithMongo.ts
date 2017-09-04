@@ -18,7 +18,7 @@ export default class workWithMongo {
      * @class workWithMongo
      * @method setMongoDbConnectionString
      */
-    private setMongoDbConnectionString():void {
+    private setMongoDbConnectionString(): void {
         /* Set constant */
         const mongo = configs.databases.mongodb;
         /* Set private var */
@@ -32,7 +32,7 @@ export default class workWithMongo {
      * @class workWithMongo
      * @method getMongoDbConnectionString
      */
-    public getMongoDbConnectionString():string {
+    public getMongoDbConnectionString(): string {
         return this.mongoDbConnectionString;
     }
     /**
@@ -50,11 +50,16 @@ export default class workWithMongo {
      * @class workWithMongo
      * @method connectToDatabase
      */
-    private connectToDatabase():any {
+    private connectToDatabase(): any {
         this.connection = mongoose.createConnection(this.mongoDbConnectionString, (error, result) => {
-            /* Log in console */
-            (<any>this.crypt).grave.mongo = this.connection;
-            this.logger.console("info", "MongoDB is connected!");
+            /* Check error */
+            if(error != undefined) {
+                this.logger.console("error", `Can not connected to MongoDB with error: ${JSON.stringify(error)}`);
+            } else {
+                /* Log in console */
+                (<any>this.crypt).grave.mongo = this.connection;
+                this.logger.console("info", "MongoDB is connected!");
+            }
         });
     }
     /**
@@ -64,7 +69,7 @@ export default class workWithMongo {
      * 
      * @memberOf workWithMongo
      */
-    private setLogger():void {
+    private setLogger(): void {
         /* Set logger options */
         const options: Object = {
             "path": "mongoose.connection"
@@ -79,6 +84,7 @@ export default class workWithMongo {
     constructor(crypt: Crypt) {
         this.crypt = crypt;
         this.setLogger();
+        this.logger.setCrypt(this.crypt);        
         mongoose.Promise = global.Promise;
         this.setMongoDbConnectionString();
         this.connectToDatabase();

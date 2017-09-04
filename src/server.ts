@@ -27,6 +27,7 @@ import JWTMiddleware from "./middlewares/jwt-decode";
 import logErrors from "./middlewares/logErrors";
 import Crypt from "./modules/crypt";
 import AccessControl from "./middlewares/accessControl";
+import SentryService from "./modules/sentryService";
 /**
  * The server.
  *
@@ -89,6 +90,10 @@ export class Server {
      * @method config
      */
     public config() {
+        /* Connect to sentry by raven */
+        const sentryService = new SentryService();
+        sentryService.setCrypt(this.crypt);
+        sentryService.connect();
         /* Add static path */
         this.app.use(express.static(path.join(__dirname, "public")));
         /* Configure PUG */

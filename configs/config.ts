@@ -1,6 +1,7 @@
 const config =  {
     "sentry": {
-        "dns": "https://ea3e15af4cf248a7929ad4ce6adc097b@sentry.dev.cloud.itlabs.io/20"
+        "dns": "https://ea3e15af4cf248a7929ad4ce6adc097b:39c73fe0669b4b94a6d2612eaea1af93@sentry.dev.cloud.itlabs.io/20",
+        "levels": ["WARN", "ERROR"]
     },
     "server" : {
         "host": "localhost",
