@@ -3,8 +3,11 @@ import * as cookieParser from "cookie-parser";
 import * as express from "express";
 import * as logger from "morgan";
 import * as path from "path";
+/* Add reven */
+import * as Raven from 'raven';
 import methodOverride = require("method-override");
 import mongoose = require("mongoose");
+import errorHandler = require("errorhandler");
 /* Configuration server constant */
 import configs from "../configs/config";
 /* Check mongo-express variable */
@@ -22,6 +25,8 @@ import workWithMongo from "./modules/workWithMongo";
 /* import middlewares */
 import JWTMiddleware from "./middlewares/jwt-decode";
 import logErrors from "./middlewares/logErrors";
+import Crypt from "./modules/crypt";
+import AccessControl from "./middlewares/accessControl";
 /**
  * The server.
  *
@@ -30,7 +35,8 @@ import logErrors from "./middlewares/logErrors";
 export class Server {
     public app: express.Application;
     private model: IModel;
-    private configs: Object
+    private configs: Object;
+    private crypt: Crypt;
     /**
      * Bootstrap the application.
      *
@@ -50,6 +56,7 @@ export class Server {
      * @constructor
      */
     constructor() {
+        this.crypt = new Crypt();
         /* Instance default
          * initialize this to an empty object */
         this.model = Object();
@@ -87,8 +94,6 @@ export class Server {
         /* Configure PUG */
         this.app.set("views", path.join(__dirname, "views"));
         this.app.set("view engine", "pug");
-        /* Use logger middleware */
-        //this.app.use(logger("dev"));
         /* Use JSON parser middleware */
         this.app.use(bodyParser.json());
         /* Use query string parser middlewares */
@@ -103,7 +108,7 @@ export class Server {
         this.customMiddlewares();
         /* Check database main */
         if(configs.databases.main == "mongodb") {
-            const mongooseConnection: workWithMongo = new workWithMongo();
+            const mongooseConnection: workWithMongo = new workWithMongo(this.crypt);
         }
         /* Check run mongo-express */
         if(configs.mongoExpress.run) {
@@ -117,17 +122,26 @@ export class Server {
      * @method Custom middlewares
      */
     private customMiddlewares() {
-        /* Add access control middlewares */
-        const jwtMiddleware =  new JWTMiddleware();
-        this.app.use(jwtMiddleware.withoutDecode);
+        /* Add access control middlewares (by JWT)*/
+        const jwtMiddleware =  new JWTMiddleware(this.crypt);
+        this.app.use(jwtMiddleware.withoutDecode.bind(jwtMiddleware));
+        /* Add access coontrol middlewares (by cehck decoded) */
+        const accessControl = new AccessControl();
+        this.app.use(accessControl.checkAccess);
     }
     /**
      * Add middlewares before response
      */
     private postRequestMiddlewares() {
-        /* Add loggers */
-        const LogErrors = new logErrors();
-        this.app.use(LogErrors.onlyError);
+        /* Check config */
+        if(configs.logger.errorHandler == "custom") {
+            /* Add custom error handler */
+            const LogErrors = new logErrors();
+            this.app.use(LogErrors.onlyError);
+        } else {
+            /* Add standart error handler */
+            this.app.use(errorHandler());
+        }
     }
     /**
      * Create router (with render).

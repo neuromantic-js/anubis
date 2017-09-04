@@ -5,6 +5,7 @@ import * as express from "express";
 import jwt = require("jsonwebtoken");
 import User from "../types/user";
 import config from "../../configs/config";
+import Crypt from "../modules/crypt";
 /**
  * Main constants
  */
@@ -52,17 +53,33 @@ const getTokenString = (req: express.Request): string => {
     /* Return token */
     return String(token);
 };
-/*
+/**
+ * @export
  * @class JWTMiddleware
  */
 export default class JWTMiddleware {
+    private crypt: Crypt;
     /**
-     * Constructor
-     *
-     * @class JWTMiddleware
-     * @constructor
+     * Creates an instance of JWTMiddleware.
+     * @param {Crypt} crypt 
+     * 
+     * @memberOf JWTMiddleware
      */
-    constructor() {}
+    constructor(crypt: Crypt) {
+        this.crypt = crypt;
+        console.log("ASD", this);
+    }
+    /**
+     * Return current crypt
+     * 
+     * @private
+     * @returns {Crypt} 
+     * 
+     * @memberOf JWTMiddleware
+     */
+    private getMyCrypt(): Crypt {
+        return this.crypt;
+    };
     /**
      * Method for access without decode
      *
@@ -73,6 +90,12 @@ export default class JWTMiddleware {
      * @next {NextFunction} Execute the next method
      */
     public withoutDecode(req: express.Request, res: express.Response, next: express.NextFunction): void {
+        /* Add auth object to request */
+        Object.defineProperty(req, "auth", {
+            value: "without-control",
+            writable: false,
+            configurable: false
+        });
         next();
     }
     /**
@@ -122,8 +145,12 @@ export default class JWTMiddleware {
             /* Try decode token */
             decodeToken(token)
                 .then(user => {
-                    /* Add user to request */
-                    req.body.decoded = user;
+                    /* Add auth object to request */
+                    Object.defineProperty(req, "auth", {
+                        value: user,
+                        writable: false,
+                        configurable: false
+                    });
                     next();
                 })
                 .catch(error => {

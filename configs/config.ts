@@ -1,9 +1,13 @@
 const config =  {
+    "sentry": {
+        "dns": "https://ea3e15af4cf248a7929ad4ce6adc097b@sentry.dev.cloud.itlabs.io/20"
+    },
     "server" : {
         "host": "localhost",
         "port": 8080,
     },
     "logger": {
+        "errorHandler": "custom",
         "level": "errors",
         "type": "json",
         "console": true

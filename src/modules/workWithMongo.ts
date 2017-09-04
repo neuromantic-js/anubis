@@ -2,6 +2,7 @@
 import mongoose = require("mongoose");
 import configs from "../../configs/config";
 import Logger from "./logger";
+import Crypt from "../modules/crypt"
 /**
  * @class workWithMongoose
  */
@@ -9,6 +10,7 @@ export default class workWithMongo {
     private mongoDbConnectionString: string;
     private connection: mongoose.Connection;
     private logger: Logger;
+    private crypt: Crypt; 
     /**
      * Set connection string to MongoDB.
      * Get data from configs.
@@ -51,14 +53,16 @@ export default class workWithMongo {
     private connectToDatabase():any {
         this.connection = mongoose.createConnection(this.mongoDbConnectionString, (error, result) => {
             /* Log in console */
+            (<any>this.crypt).grave.mongo = this.connection;
             this.logger.console("info", "MongoDB is connected!");
         });
     }
     /**
-     * Set logger to Mongoose object
-     *
-     * @class workWithMongo
-     * @method setLogger
+     * Set loggeR
+     * 
+     * @private
+     * 
+     * @memberOf workWithMongo
      */
     private setLogger():void {
         /* Set logger options */
@@ -68,11 +72,12 @@ export default class workWithMongo {
         this.logger = new Logger(options);
     }
     /**
-     * Constructor
-     * @class workWithMongo
-     * @constructor
+     * Creates an instance of workWithMongo.
+     * 
+     * @memberOf workWithMongo
      */
-    constructor() {
+    constructor(crypt: Crypt) {
+        this.crypt = crypt;
         this.setLogger();
         mongoose.Promise = global.Promise;
         this.setMongoDbConnectionString();

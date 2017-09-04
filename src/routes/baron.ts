@@ -38,19 +38,19 @@ export class BaronRoute extends BaseRoute {
      * @next {NextFunction} Execute the next method
      */
     public getBaronInfo(req: Request, res: Response, next: NextFunction) {
+        console.log((<any>req).auth);
         /* Set custom title */
-        this.title = "About | Mamn Brigitte";
+        this.title = "About | Baron Samedi";
         /* Set options */
         let options: Object = {
-            "message": "Welcome to catalog of microservices"
+            "message": "Biolerpate for NodeJS/Express based on Typescript"
         };
-        const testError = true;
-        /* Render template */
-        if(testError){
-            const error = new Error("NotFound");
-            next(error);
-        } else {
+        /* Try render template */
+        try {
             this.render(req, res, "about.pug");
+        } catch (e) {
+            const error = new Error(e);
+            next(error);
         }
     }
 }
