@@ -1,4 +1,9 @@
 const config =  {
+    "cors": {
+        "origin": "*",
+        "headers": "referrer, x-access-token, Origin, X-Requested-With, Content-Type, Accept, x-language, X-CSRFToken",
+        "methods": "GET, POST, HEAD, PUT, DELETE, OPTIONS"
+    },
     "sentry": {
         "dns": "https://ea3e15af4cf248a7929ad4ce6adc097b:39c73fe0669b4b94a6d2612eaea1af93@sentry.dev.cloud.itlabs.io/20",
         "levels": ["WARN", "ERROR"]

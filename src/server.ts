@@ -28,6 +28,7 @@ import logErrors from "./middlewares/logErrors";
 import Crypt from "./modules/crypt";
 import AccessControl from "./middlewares/accessControl";
 import SentryService from "./modules/sentryService";
+import CORS from "./middlewares/cors";
 /**
  * The server.
  *
@@ -61,10 +62,12 @@ export class Server {
         /* Instance default
          * initialize this to an empty object */
         this.model = Object();
+        this.crypt.setModel(this.model);
         /* Set configs */
         this.configs = configs;
         /* Create expressjs application */
         this.app = express();
+        this.crypt.setApp(this.app);
         /* Configure application */
         this.config();
         /* Add routes */
@@ -133,6 +136,15 @@ export class Server {
         /* Add access coontrol middlewares (by cehck decoded) */
         const accessControl = new AccessControl();
         this.app.use(accessControl.checkAccess);
+        /* Add cors request */
+        const cors = new CORS();
+        const configCors = configs.cors;
+        /* Set some options for CORS */
+        cors.setOrigin(configCors.origin);
+        cors.setHeaders(configCors.headers);
+        cors.setMethods(configCors.methods);
+        /* Add CORS middleware */
+        this.app.use(cors.cors);
     }
     /**
      * Add middlewares before response

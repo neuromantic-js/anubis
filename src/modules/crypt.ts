@@ -68,7 +68,8 @@ export default class Crypt {
             sentry: undefined,
             mongo: undefined,
             pqsql: undefined,
-            models: undefined
+            models: undefined,
+            app: undefined
         };
         /* Set grave in crypt */
         this.setGrave(cryptObject);
@@ -92,5 +93,41 @@ export default class Crypt {
      */
     public setMongo(value: mongoose.Connection): void {
         (<any>this.grave).mongo = value;
+    }
+    /**
+     * Set application object 
+     * 
+     * @param {*} value 
+     * 
+     * @memberOf Crypt
+     */
+    public setModel(value: any): void {
+        (<any>this.grave).model = value;
+    }
+    /**
+     * Set model
+     * 
+     * @param {*} value 
+     * 
+     * @memberOf Crypt
+     */
+    public setApp(value: any): void {
+        (<any>this.grave).app = value;
+    }
+    /**
+     * Set new crypt key
+     * 
+     * @param {string} key 
+     * @param {*} value 
+     * 
+     * @memberOf Crypt
+     */
+    public setProp(key: string, value: any): void {
+        const grave: Object = <any>this.grave;
+        Object.defineProperty(grave, key, {
+            value: value,
+            writable: true,
+            configurable: true
+        });
     }
 }
