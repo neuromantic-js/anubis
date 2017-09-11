@@ -2,7 +2,7 @@
 import mongoose = require("mongoose");
 import configs from "../../configs/config";
 import Logger from "./logger";
-import Crypt from "../modules/crypt"
+import SBI from "sbi";
 /**
  * @class workWithMongoose
  */
@@ -10,7 +10,7 @@ export default class workWithMongo {
     private mongoDbConnectionString: string;
     private connection: mongoose.Connection;
     private logger: Logger;
-    private crypt: Crypt; 
+    private storage;
     /**
      * Set connection string to MongoDB.
      * Get data from configs.
@@ -57,7 +57,10 @@ export default class workWithMongo {
                 this.logger.console("error", `Can not connected to MongoDB with error: ${JSON.stringify(error)}`);
             } else {
                 /* Log in console */
-                (<any>this.crypt).grave.mongo = this.connection;
+                this.storage.set({
+                  "key": "mongoConnection",
+                  "value": this.connection
+                });
                 this.logger.console("info", "MongoDB is connected!");
             }
         });
@@ -81,10 +84,9 @@ export default class workWithMongo {
      * 
      * @memberOf workWithMongo
      */
-    constructor(crypt: Crypt) {
-        this.crypt = crypt;
+    constructor() {
+        this.storage = new SBI();
         this.setLogger();
-        this.logger.setCrypt(this.crypt);        
         mongoose.Promise = global.Promise;
         this.setMongoDbConnectionString();
         this.connectToDatabase();

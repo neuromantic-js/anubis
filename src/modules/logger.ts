@@ -1,13 +1,13 @@
 import intel = require("intel");
-import Crypt from "../modules/crypt";
 import config from "../../configs/config";
+import SBI from "sbi";
 /**
  * @class Logger
  */
 export default class Logger {
-    /* Set class variables */
-    private path: string;
-    private crypt: Crypt;
+  /* Set class variables */
+  private path: string;
+  private storage: SBI;
     /**
      * Set level for logger
      *
@@ -17,6 +17,7 @@ export default class Logger {
      */
     private setLevel(value: string): void {
         this.path = value;
+        this.storage = new SBI();
     }
     /**
      * Constructor
@@ -26,16 +27,6 @@ export default class Logger {
      */
     constructor(obj) {
         this.setLevel(String(obj.path));
-    }
-    /**
-     * Set crypt attribute 
-     * 
-     * @param {Crypt} crypt 
-     * 
-     * @memberOf Logger
-     */
-    public setCrypt(crypt: Crypt):void {
-        this.crypt = crypt;
     }
     /**
      * Get message in console
@@ -72,8 +63,7 @@ export default class Logger {
         const sentryLevels = config.sentry.levels;
         /* Check crypt object &
          * find level in settings (config object) */
-        if(this.crypt &&
-            sentryLevels.indexOf(logLevel) != -1) {
+        if(sentryLevels.indexOf(logLevel) != -1) {
                 /* Set tags array */
                 const tags: Array<string> = [
                     this.path,
@@ -81,7 +71,7 @@ export default class Logger {
                     "sentry"
                 ];
                 /* Set sentry client  */
-                const sentryClient = (<any>this.crypt).grave.sentry;
+                const sentryClient = this.storage.get("sentry").item();
                 /* Check sentry client */
                 if(sentryClient != undefined) {
                     /* Set options object */

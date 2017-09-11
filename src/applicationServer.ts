@@ -1,12 +1,11 @@
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as express from "express";
-import * as logger from "morgan";
 import * as path from "path";
+import SBI from "sbi";
 /* Add reven */
 import * as Raven from 'raven';
 import methodOverride = require("method-override");
-import mongoose = require("mongoose");
 import errorHandler = require("errorhandler");
 /* Configuration server constant */
 import configs from "../configs/config";
@@ -25,7 +24,6 @@ import workWithMongo from "./modules/workWithMongo";
 /* import middlewares */
 import JWTMiddleware from "./middlewares/jwt-decode";
 import logErrors from "./middlewares/logErrors";
-import Crypt from "./modules/crypt";
 import AccessControl from "./middlewares/accessControl";
 import SentryService from "./modules/sentryService";
 import CORS from "./middlewares/cors";
@@ -39,7 +37,7 @@ export class Server {
     public app: express.Application;
     private model: IModel;
     private configs: Object;
-    private crypt: Crypt;
+    private storage: SBI;
     /**
      * Bootstrap the application.
      *
@@ -59,24 +57,30 @@ export class Server {
      * @constructor
      */
     constructor() {
-        this.crypt = new Crypt();
-        /* Instance default
-         * initialize this to an empty object */
-        this.model = Object();
-        this.crypt.setModel(this.model);
-        /* Set configs */
-        this.configs = configs;
-        /* Create expressjs application */
-        this.app = express();
-        this.crypt.setApp(this.app);
-        /* Configure application */
-        this.config();
-        /* Add routes */
-        this.routes();
-        /* Add middlewares with post data */
-        this.postRequestMiddlewares();
-        /* Add api */
-        this.api();
+      this.storage = new SBI();
+      /* Instance default
+       * initialize this to an empty object */
+      this.model = Object();
+      this.storage.set({
+        "key": "model",
+        "value": this.model
+      });
+      /* Set configs */
+      this.configs = configs;
+      /* Create Express application */
+      this.app = express();
+      this.storage.set({
+        "key": "application",
+        "value": this.app
+      });
+      /* Configure application */
+      this.config();
+      /* Add routes */
+      this.routes();
+      /* Add middlewares with post data */
+      this.postRequestMiddlewares();
+      /* Add api */
+      this.api();
     }
     /**
      * Create REST API routes
@@ -96,7 +100,10 @@ export class Server {
     public config() {
         /* Connect to sentry by raven */
         const sentryService = new SentryService();
-        sentryService.setCrypt(this.crypt);
+        this.storage.set({
+          "key": "sentry",
+          "value": sentryService
+        });
         sentryService.connect();
         /* Add static path */
         this.app.use(express.static(path.join(__dirname, "public")));
@@ -117,7 +124,7 @@ export class Server {
         this.customMiddlewares();
         /* Check database main */
         if(configs.databases.main == "mongodb") {
-            const mongooseConnection: workWithMongo = new workWithMongo(this.crypt);
+            const mongooseConnection: workWithMongo = new workWithMongo();
         }
         /* Check run mongo-express */
         if(configs.mongoExpress.run) {
@@ -132,7 +139,7 @@ export class Server {
      */
     private customMiddlewares() {
         /* Add access control middlewares (by JWT)*/
-        const jwtMiddleware =  new JWTMiddleware(this.crypt);
+        const jwtMiddleware =  new JWTMiddleware();
         this.app.use(jwtMiddleware.withoutDecode.bind(jwtMiddleware));
         /* Add access coontrol middlewares (by cehck decoded) */
         const accessControl = new AccessControl();

@@ -1,27 +1,17 @@
 import config from "../../configs/config";
-import Crypt from "../modules/crypt";
 import Logger from "./logger";
 import * as Raven from 'raven';
+import SBI from "sbi";
 /**
  * @export
  * @class SentryService
  */
 export default class SentryService {
     private dns: string;
-    private crypt: Crypt;
+    private storage: SBI;
     private logger: Logger;
     private connection: Object;
-    /**
-     * Set crypt from global
-     * 
-     * @private
-     * @param {Crypt} value 
-     * 
-     * @memberOf SentryService
-     */
-    public setCrypt(value: Crypt): void {
-        this.crypt = value;
-    }
+
     /**
      * Creates an instance of SentryService.
      * 
@@ -34,6 +24,8 @@ export default class SentryService {
         };
         /* Create new logger object */
         this.logger = new Logger(options);
+        /* Get storage */
+        this.storage = new SBI();
     }
     /**
      * Set DNS attribute
@@ -54,10 +46,9 @@ export default class SentryService {
      * @memberOf SentryService
      */
     private setInGrave(value: Object): void {
-        /* Set grave */
-        const grave = (<any>this.crypt).grave;
-        /* Set in grave */
-        grave.sentry = value;
+      /* Set grave */
+      let sentryObject = this.storage.get("sentry").item();
+      sentryObject = value;
     }
     /**
      * Connect to sentry by config 

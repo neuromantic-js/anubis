@@ -5,32 +5,33 @@ import * as express from "express";
 import jwt = require("jsonwebtoken");
 import User from "../types/user";
 import config from "../../configs/config";
-import Crypt from "../modules/crypt";
+import Logger from "../modules/logger";
 /**
  * Main constants
  */
 const secretWord: string = String(config.jwt.salt);
 const decodeToken = (token: string): Promise<User> => {
-    /* Return promise */
-    return new Promise<User>((resolve, reject) => {
-        /* Try decode token */
-        jwt.verify(token, secretWord, (error, decoded) => {
-            /* Check returned value */
-            if(error !== null) {
-                /* Return error */
-                reject(new User(error));
-            } else {
-                /* Return value */
-                resolve(new User(decoded));
-            }
-        });
+  /* Return promise */
+  return new Promise<User>((resolve, reject) => {
+    /* Try decode token */
+    jwt.verify(token, secretWord, (error, decoded) => {
+      /* Check returned value */
+      if(error !== null) {
+          /* Return error */
+          reject(new User(error));
+      } else {
+          /* Return value */
+          resolve(new User(decoded));
+      }
     });
+  });
 };
 const getTokenString = (req: express.Request): string => {
     /* Set empty token */
     let token = undefined;
     /* Check headers */
     if(req.headers.hasOwnProperty("token")) {
+
         token = req.headers.token;
     } else {
         /* Chec cookies */
@@ -58,27 +59,15 @@ const getTokenString = (req: express.Request): string => {
  * @class JWTMiddleware
  */
 export default class JWTMiddleware {
-    private crypt: Crypt;
-    /**
-     * Creates an instance of JWTMiddleware.
-     * @param {Crypt} crypt 
-     * 
-     * @memberOf JWTMiddleware
-     */
-    constructor(crypt: Crypt) {
-        this.crypt = crypt;
+    private logger: Logger;
+
+    constructor() {
+        /* Set logger options */
+        const options = {
+            "path": "middlewares.JWTMiddleware"
+        };
+        this.logger = new Logger(options);
     }
-    /**
-     * Return current crypt
-     * 
-     * @private
-     * @returns {Crypt} 
-     * 
-     * @memberOf JWTMiddleware
-     */
-    private getMyCrypt(): Crypt {
-        return this.crypt;
-    };
     /**
      * Method for access without decode
      *
@@ -116,15 +105,15 @@ export default class JWTMiddleware {
                 .then(user => {
                     next();
                 })
-                .catch(error => {
-                    /* TODO add error handler */
-                    throw error;
+                .catch(err => {
+                  const error = new Error(err);
+                  next(error);
                 });
 
         } else {
-            /* If token not send
-             * TODO add to error handler */
-            res.redirect("/login");
+            this.logger.console("warn", "Not send token");
+            const error = new Error("Unauthorized");
+            next(error);
         }
     }
     /**
