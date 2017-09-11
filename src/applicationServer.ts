@@ -3,15 +3,15 @@ import * as cookieParser from "cookie-parser";
 import * as express from "express";
 import * as path from "path";
 import SBI from "sbi";
-/* Add reven */
-import * as Raven from 'raven';
 import methodOverride = require("method-override");
 import errorHandler = require("errorhandler");
-/* Configuration server constant */
+/* Configuration servet */
+import ApplicationsConfig from "../configs/appConfig";
+import ciConfig from "../configs/ciConfig";
 import configs from "../configs/config";
 /* Check mongo-express variable */
+import MongoExpressConfigAssembler from "../configs/mongoExpressConfig";
 import mongoExpress = require("mongo-express/lib/middleware");
-import mongoExpressConfig from "../configs/mongo-express-config";
 /* Import routes */
 import { BaronRoute } from "./routes/baron";
 /* Imports fo ODM
@@ -38,6 +38,7 @@ export class Server {
     private model: IModel;
     private configs: Object;
     private storage: SBI;
+    private serverConfigs: ApplicationsConfig;
     /**
      * Bootstrap the application.
      *
@@ -57,7 +58,16 @@ export class Server {
      * @constructor
      */
     constructor() {
+      /* Create object with server settings */
+      this.serverConfigs = new ApplicationsConfig();
+      this.serverConfigs.setCiConfig(ciConfig);
+      /* Connect to applications storage */
       this.storage = new SBI();
+      /* Add all configs in box */
+      this.storage.set({
+        "key": "configs",
+        "value": this.serverConfigs
+      });
       /* Instance default
        * initialize this to an empty object */
       this.model = Object();
@@ -98,6 +108,12 @@ export class Server {
      * @method config
      */
     public config() {
+      /* Get applications settings from store */
+      const allSettings = (<any>this.serverConfigs.getMe()).app;
+      const upstartModules = allSettings.modules;
+      const appSettings = allSettings.settings;
+      /* Check sentry */
+      if(upstartModules.sentry == true) {
         /* Connect to sentry by raven */
         const sentryService = new SentryService();
         this.storage.set({
@@ -105,31 +121,52 @@ export class Server {
           "value": sentryService
         });
         sentryService.connect();
+      }
+      /* Check static folder */
+      if(upstartModules.staticFolder == true){
         /* Add static path */
         this.app.use(express.static(path.join(__dirname, "public")));
+      }
+      /* Check tamplate engine */
+      if(upstartModules.templates == true) {
         /* Configure PUG */
-        this.app.set("views", path.join(__dirname, "views"));
-        this.app.set("view engine", "pug");
+        this.app.set("views", path.join(__dirname, appSettings.templates.dir));
+        this.app.set("view engine", appSettings.templates.engine);
+      }
+      /* Check json parser middlewares */
+      if(upstartModules.jsonParser == true) {
         /* Use JSON parser middleware */
         this.app.use(bodyParser.json());
+      }
+      /* Check query parser */
+      if(upstartModules.queryParser == true) {
         /* Use query string parser middlewares */
         this.app.use(bodyParser.urlencoded({
-            extended: true
+          extended: true
         }));
+      }
+      /* Check cookie */
+      if(upstartModules.cookieParser == true) {
         /* Use cookie parser middleware */
         this.app.use(cookieParser());
+      }
+      /* Check method override */
+      if(upstartModules.methodOverride == true) {
         /* Use override middleware */
         this.app.use(methodOverride());
-        /* Add my custom middlewares */
-        this.customMiddlewares();
-        /* Check database main */
-        if(configs.databases.main == "mongodb") {
-            const mongooseConnection: workWithMongo = new workWithMongo();
-        }
-        /* Check run mongo-express */
-        if(configs.mongoExpress.run) {
-            this.app.use("/baron-admin", mongoExpress(mongoExpressConfig));
-        }
+      }
+      /* Add my custom middlewares */
+      this.customMiddlewares();
+      /* Check database main */
+      if(appSettings.mainDB == "mongodb") {
+        const mongooseConnection: workWithMongo = new workWithMongo();
+      }
+      /* Check run mongo-express */
+      if(upstartModules.mongoExpress == true) {
+        const mongoExpressConfigAssembler = new MongoExpressConfigAssembler();
+        const MEConfigs = mongoExpressConfigAssembler.getMEConfig();
+        this.app.use("/baron-admin", mongoExpress(MEConfigs));
+      }
     }
     /**
      * Add custom middlewares
