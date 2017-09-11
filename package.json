@@ -4,7 +4,7 @@
     "description": "Baron Samedi - it is boilerplate/framework based on Express/NodeJS, worked with MongoDB, PGSQL and cached in Redis.",
     "main": "index.js",
     "scripts": {
-        "start": "if-env NODE_DEV=production && ts-node ./src/app.ts || nodemon --exec ts-node ./src/app.ts"
+        "start": "if-env NODE_DEV=production && ts-node ./src/app.ts || nodemon $NODE_DEBUG_OPTION --exec ts-node ./src/run.ts"
     },
     "repository": {
         "type": "git",
