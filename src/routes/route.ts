@@ -38,8 +38,8 @@ export class BaseRoute {
      * @method render
      * @param req {Request} The request object.
      * @param res {Response} The response object.
-     * @param view {String} The view to render.
-     * @param options {Object} Additional options to append to the view's local scope.
+     * @param view {String} The views to render.
+     * @param options {Object} Additional options to append to the views's local scope.
      * @return void
      */
     public render(req: Request, res: Response, view: string, options?: Object) {
@@ -49,7 +49,7 @@ export class BaseRoute {
         res.locals.scripts = this.scripts;
         /* Add title */
         res.locals.title = this.title;
-        /* Render view */
+        /* Render views */
         res.render(view, options);
     }
 }

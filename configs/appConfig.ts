@@ -35,7 +35,7 @@ const config: Object =  {
     },
     "templates": {
       "engine": "pug",
-      "dir": "view"
+      "dir": "views"
     },
     "mongoExpress": {
       "autoReconnect": true,
@@ -52,8 +52,8 @@ const config: Object =  {
       "sslEnabled": false,
       "sslCert": "",
       "useBasicAuth": true,
-      "basicAuthLogin": "baron",
-      "basicAuthPassword": "samedi",
+      "basicAuthLogin": "admin",
+      "basicAuthPassword": "anubis",
       "documentPerPage": 10,
       "editorTheme": "rubyblue",
       "maxPropSize": (100 * 1000),
@@ -62,7 +62,7 @@ const config: Object =  {
       "subprocessTimeout": 300,
       "readOnly": false,
       "defaultKeyNames": {},
-      "url": process.env.MONGO_URL || "mongodb://localhost:27017/baron-samedi"
+      "url": process.env.MONGO_URL || "mongodb://localhost:27017/anubis"
     }
   }
 };

@@ -1,8 +1,54 @@
 html
   head
-    link(rel="stylesheet", type="text/css", href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css")
+    link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css")
+    link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
     script(src="https://code.jquery.com/jquery-3.1.1.min.js", integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=", crossorigin="anonymous")
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js")
+    script(src="/init.js")
     title= title
   body
-    block content
+    if isAuth
+      nav
+        div.nav-wrapper.teal
+          a(href="#").brand-logo Anubis | #{message}
+          ul#nav-mobile.right.hide-on-med-and-down
+            li
+              a(href="/profile")
+                i.material-icons account_circle
+            li
+              a(href="/orders/create")
+                i.material-icons add
+            li
+              a(href="/orders")
+                i.material-icons business
+            li
+              a(href="/projects")
+                i.material-icons view_module
+            li
+              a(href="/reports")
+                i.material-icons insert_chart
+            li
+              a(href="/logout")
+                i.material-icons exit_to_app
+    div.container
+      block content
+    div.footer
+      footer.page-footer.teal
+        div.container
+         div.row
+          div.col.l6.s12
+            h5.white-text Об Anubis
+            p.grey-text.text-lighten-4 Anubis - сервис управления проектами на фрилансе компании "Строительный двор". Разработано на базе платформы Baron Samedi.
+          div.col.l4.offset-l2.s12
+            h5.white-text Ссыли
+            ul
+              li
+                a.grey-text.text-lighten-3(href="https://github.com/neuromantic-js/baron-samedi.git") GitHub платфомы
+              li
+                a.grey-text.text-lighten-3(href="https://www.sdvor.com/auth/register/") Зарегистрировать аккаунт
+              li
+                a.grey-text.text-lighten-3(href="mailto:dshevelev@sdvor.com") Написать в техническую поддержку
+        div.footer-copyright
+          div.container
+            span © 2017, разработано Neuromanticjs
+            a.grey-text.text-lighten-4.right(href="https://sdvor.com") Интернет-магазин

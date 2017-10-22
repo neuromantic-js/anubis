@@ -10,7 +10,7 @@ const ciConfig: Object = {
     "auth": conf.MONGO_AUTH || false,
     "user": conf.MONGO_USER || "",
     "password": conf.MONGO_PWD || "",
-    "dbname": conf.MONGO_DBNAME || "baron-samedi"
+    "dbname": conf.MONGO_DBNAME || "anubis"
   },
   "redis": {
     "host": conf.REDIS_HOST || "localhost",

@@ -1,54 +1,56 @@
+import { create } from 'domain';
 import { NextFunction, Request, Response, Router } from "express";
 import { BaseRoute } from "./route";
-/**
- *
- * @class route
- */
+import SBI from 'sbi';
+import winston = require('winston');
+
+
 export class BaronRoute extends BaseRoute {
-    /**
-     *
-     * Create the routes
-     *
-     * @class BaronRoute
-     * @method create
-     * @static
-     */
+
+
     public static create(router: Router) {
-        console.log("[BaronRouter::create] Creating baron router");
-        /* Add page with informations for BaronSaturdayBoilerplate */
-        router.get("/baron", (req: Request, res: Response, next: NextFunction) => {
+        const options = {
+            path: 'BaronRoute.create'
+        };
+        const storage = new SBI();
+        const logger = storage.get('logger').item();
+        const  baronRouter: winston.LoggerInstance = (<any>logger).addCategory('BaronRouter', 'console', 'info', true, `${process.pid}/Information`);
+        
+        storage.set({
+            key: 'BaronRouter',
+            value: baronRouter
+        });
+
+        baronRouter.info('Create information router');
+
+        router.get('/baron', (req: Request, res: Response, next: NextFunction) => {
             new BaronRoute().getBaronInfo(req, res, next);
         });
     }
-    /**
-     * Constructor
-     *
-     * @class BaronRouter
-     * @constructor
-     */
+
+
     constructor() {
         super();
     }
-    /**
-     * The information page route
-     * @class BaronRoute
-     * @method getBaronInfo
-     * @param req {Request} The express request object
-     * @param res {Response} The express response object
-     * @next {NextFunction} Execute the next method
-     */
+    
+    
     public getBaronInfo(req: Request, res: Response, next: NextFunction) {
-        console.log("THIS");
-        /* Set custom title */
-        this.title = "About | Baron Samedi";
-        /* Set options */
-        let options: Object = {
-            "message": "Biolerpate for NodeJS/Express based on Typescript"
+        const storage: SBI = new SBI();
+        const baronRouter: winston.LoggerInstance = storage.get('BaronRouter').item();
+
+        this.title = 'About | Baron Samedi';
+
+
+        let pageOptions: Object = {
+          message: 'Biolerpate for NodeJS/Express based on Typescript',
+          isAuth: false
         };
-        /* Try render template */
+    
         try {
-            this.render(req, res, "about.pug");
+            baronRouter.info('Call information page');
+            this.render(req, res, 'about.pug', pageOptions);
         } catch (e) {
+            baronRouter.error('Can not information page');
             const error = new Error(e);
             next(error);
         }

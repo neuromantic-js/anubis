@@ -1,10 +1,10 @@
 {
-    "name": "baron-samedi",
+    "name": "abubis",
     "version": "0.0.1",
     "description": "Baron Samedi - it is boilerplate/framework based on Express/NodeJS, worked with MongoDB, PGSQL and cached in Redis.",
     "main": "index.js",
     "scripts": {
-        "start": "if-env NODE_DEV=production && ts-node ./src/app.ts || nodemon $NODE_DEBUG_OPTION --exec ts-node ./src/run.ts"
+        "start": "if-env NODE_DEV=production && ts-node ./src/app.ts || nodemon ts-node ./src/run.ts"
     },
     "repository": {
         "type": "git",
@@ -72,7 +72,8 @@
         "sequelize-typescript": "^0.4.0",
         "should": "^11.2.1",
         "ts-node": "^3.3.0",
-        "typescript": "^2.4.2"
+        "typescript": "^2.4.2",
+        "winston": "^2.4.0"
     },
     "devDependencies": {}
 }

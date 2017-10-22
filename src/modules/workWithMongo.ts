@@ -1,16 +1,48 @@
+import { connect } from 'http2';
+import Wingger from './wingger';
 /* Main imports */
-import mongoose = require("mongoose");
 import configs from "../../configs/config";
 import Logger from "./logger";
 import SBI from "sbi";
+import * as mongoose from 'mongoose';
+import { IOrderModel } from '../models/order';
+import { OrderSchema } from '../schemas/order';
+import winston = require('winston');
+import config from '../../configs/config';
 /**
  * @class workWithMongoose
  */
 export default class workWithMongo {
-    private mongoDbConnectionString: string;
-    private connection: mongoose.Connection;
-    private logger: Logger;
-    private storage;
+    private _connectionString: string;
+    private _storage: SBI;
+    private _mongooseLogger: winston.LoggerInstance;
+    private _connection: mongoose.Connection;
+
+    set connection(connection: mongoose.Connection) {
+        this._connection = connection;
+    }
+    set storage(storage: SBI) {
+        this._storage = storage;
+    }
+    set mongooseLogger(logger: winston.LoggerInstance) {
+        this._mongooseLogger = logger;
+    }
+    set connectionString(connectionString: string) {
+        this._connectionString = connectionString;
+    }
+
+    get storage(): SBI {
+        return this._storage;
+    }
+    get connection(): mongoose.Connection {
+        return this._connection;
+    }
+    get mongooseLogger(): winston.LoggerInstance {
+        return this._mongooseLogger;
+    }
+    get connectionString(): string {
+        return this._connectionString;
+    }
     /**
      * Set connection string to MongoDB.
      * Get data from configs.
@@ -22,27 +54,9 @@ export default class workWithMongo {
         /* Set constant */
         const mongo = configs.databases.mongodb;
         /* Set private var */
-        this.mongoDbConnectionString = (mongo.auth === false)
+        this.connectionString = (mongo.auth === false)
             ? `mongodb://${mongo.host}:${mongo.port}/${mongo.dbname}`
             : `mongodb://${mongo.user}:${mongo.password}@${mongo.host}:${mongo.port}/${mongo.dbname}`;
-    }
-    /**
-     * Get connection string to MongoDB
-     *
-     * @class workWithMongo
-     * @method getMongoDbConnectionString
-     */
-    public getMongoDbConnectionString(): string {
-        return this.mongoDbConnectionString;
-    }
-    /**
-     * Get all this object
-     *
-     * @class workWithMongo
-     * @method getMe
-     */
-    public getMe(): workWithMongo {
-        return this;
     }
     /**
      * Connect to database
@@ -51,33 +65,17 @@ export default class workWithMongo {
      * @method connectToDatabase
      */
     private connectToDatabase(): any {
-        this.connection = mongoose.createConnection(this.mongoDbConnectionString, (error, result) => {
-            /* Check error */
-            if(error != undefined) {
-                this.logger.console("error", `Can not connected to MongoDB with error: ${JSON.stringify(error)}`);
-            } else {
-                /* Log in console */
-                this.storage.set({
-                  "key": "mongoConnection",
-                  "value": this.connection
-                });
-                this.logger.console("info", "MongoDB is connected!");
-            }
+        this.connection = mongoose.createConnection(this.connectionString);
+        
+        this.storage.set({
+            key: 'mongoConnection',
+            value: this.connection
         });
-    }
-    /**
-     * Set loggeR
-     * 
-     * @private
-     * 
-     * @memberOf workWithMongo
-     */
-    private setLogger(): void {
-        /* Set logger options */
-        const options: Object = {
-            "path": "mongoose.connection"
-        };
-        this.logger = new Logger(options);
+
+        const model = this.storage.get('model').item();
+        (<any>model).Order = this.connection.model<IOrderModel>('OrderModel', OrderSchema);
+
+        this.mongooseLogger.info('Connected');
     }
     /**
      * Creates an instance of workWithMongo.
@@ -86,8 +84,13 @@ export default class workWithMongo {
      */
     constructor() {
         this.storage = new SBI();
-        this.setLogger();
-        mongoose.Promise = global.Promise;
+        
+        const logger: Object = this.storage.get('logger').item();
+
+        this.mongooseLogger = (<any>logger).addCategory('Mongoose', 'console', 'info', true, `${process.pid}/Mongoose`);
+        this.mongooseLogger.info('Try mongoose connection');
+
+        (<any>mongoose.Promise) = global.Promise;
         this.setMongoDbConnectionString();
         this.connectToDatabase();
     }
