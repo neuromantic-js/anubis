@@ -64,13 +64,13 @@ export default class ObjectToAnswer {
     return this._sort;
   }
   
-  constructor(status: string, error: any, code: number, data: any, version: string, limit: number, skip: number, sort: any) {
-    this.status = status;
+  constructor(error: any, code: number, data: any, limit: number, skip: number, sort: any) {
+    this.status = (error) ? 'failed' : 'success';
     this.error = error;
     this.code = code;
     this.data = (Array.isArray(data)) ? data : [data];
     this.count = this.data.length || 0;
-    this.version = version;
+    this.version = 'current';
     this.limit = limit;
     this.skip = skip;
     this.sort = sort;

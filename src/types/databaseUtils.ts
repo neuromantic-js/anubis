@@ -53,14 +53,14 @@ export default class DatabaseUtils {
           .lean();
       }
       /* Create object to answer */
-      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer('success', undefined, 200, answer, this.apiVersion, undefined, undefined, undefined);
+      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer(undefined, 200, answer,  undefined, undefined, undefined);
       /* Create object to return */
       const objectToReturn: Object = objectToAnswer.answerAfterFind();
       /* Return object to return */
       return objectToReturn;
     } catch (error) {
       /* Craete object to answer */
-      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer('failed', error, 510, undefined, this.apiVersion, this.limit, this.skip, this.sort);
+      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer(error, 510, undefined, this.limit, this.skip, this.sort);
       /* Create object to return */
       const objectToReturn: Object = objectToAnswer.answerMongooseError();
       /* Return error */
@@ -69,10 +69,11 @@ export default class DatabaseUtils {
   /* Get list entries current model */
   public async find(state: string): Promise<any> {
     try {
+      console.log(this.filters)
       /* Set empty variablie */
       let answer: Array<any>;
       /* Check state & pagination */
-      if (state == 'optimazed' && this.limit == -1) {
+      if (state == 'optimized' && this.limit == -1) {
         answer = await this.currentModel
           .find(this.filters)
           .skip(this.skip)
@@ -83,7 +84,7 @@ export default class DatabaseUtils {
           .find(this.filters)
           .skip(this.skip)
           .sort(this.sort);
-      } else if (state == 'optimazied' && this.limit != -1) {
+      } else if (state == 'optimizied' && this.limit != -1) {
         answer = await this.currentModel
           .find(this.filters)
           .skip(this.skip)
@@ -97,17 +98,17 @@ export default class DatabaseUtils {
           .limit(this.limit)
           .sort(this.sort);
       } else {
-        answer = await this.currentModel.find();
+        answer = await this.currentModel.find(this.filters);
       }
       /* Create object to answer */
-      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer('success', undefined, 200, answer, this.apiVersion, this.limit, this.skip, this.sort);
+      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer(undefined, 200, answer, this.limit, this.skip, this.sort);
       /* Create object to return */
       const objectToReturn: Object = objectToAnswer.answerAfterFind();
       /* Return object */
       return objectToReturn;
     } catch (error) {
       /* Create object to answer */
-      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer("failed", error, 501, undefined, this.apiVersion, this.limit, this.skip, this.sort);
+      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer(error, 501, undefined, this.limit, this.skip, this.sort);
       /* Crraete object to return */
       const objectToReturn: Object = objectToAnswer.answerMongooseError();
       /* Return object to return */
@@ -128,7 +129,7 @@ export default class DatabaseUtils {
       /* Check data length */
       if (answer.data.length == 0) {
         /* Answer, when arrays is empty */
-        objectToAnswer = new ObjectToAnswer('success', undefined, 404, answer.data, this.apiVersion, this.limit, this.skip, this.sort);
+        objectToAnswer = new ObjectToAnswer(undefined, 404, answer.data, this.limit, this.skip, this.sort);
         /* Create object to return */
         objectToReturn = objectToAnswer.answerAfterSave();
       } else {
@@ -149,7 +150,7 @@ export default class DatabaseUtils {
         const savedData = await objectToUpdate.save();
         
         /* Create object to answer */
-        objectToAnswer = new ObjectToAnswer('success', undefined, 201, savedData, this.apiVersion, undefined, undefined, undefined);
+        objectToAnswer = new ObjectToAnswer(undefined, 201, savedData, undefined, undefined, undefined);
         /* Create object to return */
         objectToReturn = objectToAnswer.answerAfterSave();
         /* Return answer */
@@ -160,7 +161,7 @@ export default class DatabaseUtils {
       return objectToAnswer;
     } catch (error) {
       /* Create object to answer with error */
-      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer('failed', error, 501, undefined, this.apiVersion, this.limit, this.skip, this.sort);
+      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer(error, 501, undefined, this.limit, this.skip, this.sort);
       /* Create object to return */
       const objectToReturn: Object = objectToAnswer.answerMongooseError();
       /* Return object */
@@ -190,23 +191,33 @@ export default class DatabaseUtils {
         /* Save model */
         const savedModel = await documentToSave.save();
         /* Get tools to build answer */
-        objectToAnswer = new ObjectToAnswer('success', undefined, 201, savedModel, this.apiVersion, undefined, undefined, undefined);
+        objectToAnswer = new ObjectToAnswer(undefined, 201, savedModel, undefined, undefined, undefined);
         /* Create object to return */
         objectToReturn = objectToAnswer.answerAfterSave();
         /* Return answer */
         return objectToReturn;
       } else {
-        objectToAnswer = new ObjectToAnswer('success', undefined, 200, answer.data, this.apiVersion, undefined, undefined, undefined);
+        objectToAnswer = new ObjectToAnswer(undefined, 200, answer.data, undefined, undefined, undefined);
         objectToReturn = objectToAnswer.answerAfterSave();
       }
       /* Return object */
       return objectToReturn;
     } catch (error) {
       /* Return error */
-      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer('failed', error, 501, undefined, this.apiVersion, this.limit, this.skip, this.sort);
+      const objectToAnswer: ObjectToAnswer = new ObjectToAnswer(error, 501, undefined, this.limit, this.skip, this.sort);
       const objectToReturn: Object = objectToAnswer.answerMongooseError();
       /* Return object */
       return objectToReturn;
+    }
+  }
+  
+  
+  public async count(): Promise<any> {
+    try {
+        const count: number = await this.currentModel.count();
+        return count;
+    } catch (error) {
+        return error;
     }
   }
   

@@ -1,3 +1,4 @@
+import Pagination from './middlewares/paginations';
 import { load } from 'env2conf/lib/main';
 import { appendFile } from 'fs';
 import * as bodyParser from 'body-parser';
@@ -219,6 +220,9 @@ export class Server {
       cors.setMethods(configCors.methods);
       
       this.app.use(cors.cors.bind(cors));
+
+      const pagination = new Pagination();
+      this.app.use(pagination.init);
     }
 
 

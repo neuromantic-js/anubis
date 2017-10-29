@@ -1,3 +1,6 @@
+import { IPage } from '../interfaces/page';
+import { error, promisify } from 'util';
+import OrdersUtils from '../modules/ordersUtils';
 import { IOrder } from '../interfaces/order';
 import { INestedUser } from '../interfaces/nestedUser';
 import { NextFunction, Request, Response, Router } from "express";
@@ -5,6 +8,7 @@ import { BaseRoute } from "./route";
 import SBI from 'sbi';
 import { Model } from 'mongoose';
 import { NestedUserSchema } from '../schemas/UserNested';
+import { IPagination } from '../interfaces/pagination';
 import winston = require('winston');
 
 export class OrdersRoute extends BaseRoute {
@@ -49,22 +53,37 @@ export class OrdersRoute extends BaseRoute {
     super();
   }
   
-  public getOrdersList(req: Request, res: Response, next: NextFunction) {
-    const storage: SBI = new SBI();
-    const ordersRouter: winston.LoggerInstance = storage.get('OrdersRoute').item();
+  public async getOrdersList(req: Request, res: Response, next: NextFunction): Promise<any> {
+    try { 
+      const storage: SBI = new SBI();
+      const ordersUtils: OrdersUtils = new OrdersUtils(req);
+      const promisifyActions: Array<any> = [ordersUtils.find('optimized'), ordersUtils.count()];
 
-    this.title = 'Список заказов | Anubis';
-    
-    const pageOptions: Object = {
-      message: 'Выберите из списка',
-      isAuth: true
-    };
-    
-    try {
-      ordersRouter.info('Get orders list');
+
+      const results: Array<any> = await Promise.all(promisifyActions);
+
+      
+      const ordersList: Object = (results[0]) ? results[0] : {};
+      const ordersListLength: number = (results[1]) ? results[1] : 0; 
+      
+
+      this.title = 'Список заказов | Anubis';
+
+      const currentPagination: IPagination = (<any>req).pagination;
+
+      const pages: Array<IPage> = ordersUtils.getPagesObjectList(currentPagination, ordersListLength);
+      
+      const orders: Array<any> = (<any>ordersList).answer.data;
+      console.log('ORDERS ', orders);
+      const pageOptions: Object = {
+        message: 'Выберите из списка',
+        isAuth: true,
+        orders,
+        pages
+      };
+
       this.render(req, res, 'orders.pug', pageOptions);
     } catch (e) {
-      ordersRouter.error('Can not get orders list');
       const error = new Error(e);
       next(error);
     }
@@ -183,97 +202,54 @@ export class OrdersRoute extends BaseRoute {
   }
   
   public async getEditOrderForm(req: Request, res: Response, next: NextFunction): Promise<any> {
-    const storage: SBI = new SBI();
-    const ordersLogger: winston.LoggerInstance = storage.get('OrdersRoute').item();
-    const models: Object = storage.get('model').item();
-    const OrderModel = (<any>models).Order;
+    const ordersUtils: OrdersUtils = new OrdersUtils(req);
+    
+    const filters: Object = { name: req.params.name };
 
-    const findedModel = await OrderModel.findOne({ name: req.params.name });
-
-    this.title = 'Список заказов | Anubis';
-
-    const pageOptions: Object  = {
-      message: 'Отредактируйте данные проекта',
-      isAuth: true,
-      isFind: !!(findedModel != null),
-      order: findedModel,
-    };
+    ordersUtils.changeFilters(filters);
+    
+    this.title = 'Редактирвоание заказа(проекта) | Anubis';
     
     try {
-      ordersLogger.info('Get update order form');
+      const findedData: Object = await ordersUtils.find('optimized');
+      const findedOrder = (findedData 
+                          && (<any>findedData).answer 
+                          && (<any>findedData).answer.data 
+                          && (<any>findedData).answer.data.length == 1) 
+        ? (<any>findedData).answer.data[0]
+        : undefined;  
+      const pageOptions: Object = {
+        message: 'Отредактируйте данные проекта',
+        isAuth: true,
+        isFind: (findedOrder) ? true : false,
+        order: findedOrder || {}
+      };     
       this.render(req, res, 'edit.pug', pageOptions);
     } catch (e) {
-      ordersLogger.error('Can not update order form');
-      this.render(req, res, 'edit.pug', pageOptions);
+      const error = new Error(e);
+      next(error);
     }
   }
 
   public async updateOrderEntry(req: Request, res: Response, next: NextFunction): Promise<any> {
-    const storage: SBI = new SBI();
-    const ordersLogger: winston.LoggerInstance = storage.get('OrdersRoute').item();
-    const models: Object = storage.get('model').item();
-    const OrderModel = (<any>models).Order;
-
-    this.title = 'Список заказов | Anubis';
-    /* Update all fields */
-    const fieldsToUpdate: Array<string> = Object.keys(req.body);
-    const findedEntry = await OrderModel.findOne({ name: req.params.name });
-
-    if(findedEntry != null) {
-      for(let field of fieldsToUpdate) {
-        console.log(field);
-        if(field !== 'owner' && field != 'freelancer' && field != 'save') {
-          (<any>findedEntry)[field] = req.body[field];
-        }
-      }
-
-      const nameOfOwner = ((<any>findedEntry).productOwner) ? (<any>findedEntry).productOwner.username : undefined;
-      const nameOfFreelancer = ((<any>findedEntry).freelancer) ? (<any>findedEntry).freelancer.username : undefined;
-
-      if(nameOfOwner != req.body.owner) {
-        const newOwner: INestedUser = {
-          username: req.body.owner,
-          isProductOwner: true,
-          isFreelancer: false
-        };
-        (<any>findedEntry).productOwner = newOwner;
-      }
-      if(nameOfFreelancer != req.body.freelancer) {
-        const newFreelancer: INestedUser = {
-          username: req.body.freelancer,
-          isProductOwner: false,
-          isFreelancer: true
-        };
-        (<any>findedEntry).freelancer = newFreelancer;
-      }
-    }
-    /* Create page options */
-    let pageOptions: Object;
+    const ordersUtils: OrdersUtils = new OrdersUtils(req);
 
     try {
-      const updatedEntry = await findedEntry.save();
-
-      pageOptions = {
-        message: 'Отредактируйте данные проекта',
+      const savedOrder: Object = await ordersUtils.updateOrder(req);
+      const updatedDocument: Object = (<any>savedOrder).answer.data[0];
+      const pageOptions: Object = {
+        message: 'Редактивроание данных пользователя',
         isAuth: true,
         isFind: true,
-        order: updatedEntry,
-        isUpdate: true
+        isUpdate: ((<any>savedOrder).error == 'undefined') ? true : undefined,
+        isFailed: ((<any>savedOrder).error != 'undefined') ? true : undefined,
+        order: updatedDocument
       };
 
-      ordersLogger.info('Post update order form');
       this.render(req, res, 'edit.pug', pageOptions);
     } catch (e) {
-      pageOptions = {
-        message: 'Отредактируйте данные проекта',
-        isAuth: true,
-        isFind: true,
-        order: findedEntry,
-        isFailed: true
-      };
-
-      ordersLogger.error('Can not post update order form');
-      this.render(req, res, 'edit.pug', pageOptions);
+      const error = new Error(e);
+      next(error);
     }
   }
   
